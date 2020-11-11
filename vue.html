@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="app.css">
+    <title>note</title>
+
+</head>
+
+<body>
+    <div id="app">
+        <div class="form">
+            
+
+            <div>
+                <p>Задача/Заметка</p>
+                <input type="text" size="40" placeholder="Введите задачу" :disabled="Task()" v-model="getRow().text">
+            </div>
+            <div>
+                <p>Дата</p>
+                <p><input type="date" name="calendar" :disabled="Task()" v-model="getRow().date">
+            </div>
+
+            <div>
+                <p>Повторение задачи</p>
+                <input type="radio" name="browser" value="Ежедневно" :disabled="Task()" v-model="getRow().radio"> Ежедневно <Br>
+                <input type="radio" name="browser" value="Один раз" :disabled="Task()" v-model="getRow().radio"> Один раз <Br>
+            </div>
+
+
+            <div>
+                <p>Важность задачи</p>
+                <select :disabled="Task()" v-model="getRow().imp">
+                    <option value="Важно">Важно</option>
+                    <option value="Терпимо">Терпимо</option>
+                    <option value="Неважно">Неважно</option>
+                </select>
+            </div>
+
+            <div>
+                <p>Выполнение</p>
+                <input type="checkbox" :disabled="Task()" v-model="getRow().done">
+
+            </div>
+        </div>
+        <div>
+            <button class="button1" @click="addRow()">Добавить</button>
+            <button class="button2" @click="removeRow(id)">Удалить задачу</button>
+            <button class="button2" @click="cleanList()">Очистить список</button>
+        </div>
+        <div>
+            <div class="viewTask" @click="id=i" :data-i="i" v-for="(task,i) in tasks">
+                <div v-if="task.done">
+                    Выполнено
+                </div>
+                {{task.text}}<br>{{task.date}}<br>{{task.radio}}<br>{{task.imp}}</div>
+        </div>
+
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                id: 1,
+                tasks: [{
+                    text: "eat",
+                    date: "",
+                    radio: "",
+                    imp: "",
+                    done: ""
+                }, {
+                    text: "sleep"
+                }, {
+                    text: "draw"
+
+                }]
+            },
+
+            watch: {
+                id(newId) {
+                    localStorage.setItem("id", newId);
+                },
+                tasks:{
+                    handler: function(newTasks){
+                        localStorage.setItem("task", JSON.stringify(newTasks));
+                    },
+                    deep:true
+                }
+            },
+            mounted() {
+                if (localStorage.id) {
+                    this.id = localStorage.getItem("id");
+                }
+                if (localStorage.task) {
+                    this.tasks = JSON.parse(localStorage.getItem("task"));
+                }
+            },
+
+            methods: {
+
+                addRow() {
+                    this.id = this.tasks.length;
+                    this.tasks.push({ text: "New task", date: "", radio: "Ежедневно", imp: "Важно", done: false }); 
+                },
+                removeRow(iddelete){
+                    if (this.id>0){
+                        this.id=this.id-1;
+                    }
+                    this.tasks.splice(iddelete,1);
+                },
+                getRow(){
+                    if(this.tasks[this.id]){
+                        return this.tasks[this.id];
+                    }else {
+                        return "";
+                    }
+                },
+                Task(){
+                    if(this.tasks[this.id]){
+                        return false;
+                    }else {
+                        return true;
+                    }
+                },
+                cleanList(){
+                    localStorage.clear();
+                    this.tasks=[];
+                    this.id=0;
+                }
+            }
+
+        });
+
+
+
+    </script>
+</body>
+
+</html>
